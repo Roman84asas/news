@@ -1,11 +1,10 @@
 const unirest = require('unirest');
 const cheerio = require('cheerio');
 
-function parsePost(elems) {
-    unirest.get(elems.url)
-        .end(function (data) {
-                const body = data.body;
-                const $    = cheerio.load(body);
+async function parsePost(elems) {
+    await unirest.get(elems.url)
+        .end( ({ body }) => {
+                const $ = cheerio.load(body);
 
                 const title = $(elems.title).text().trim();
                 const text  = $(elems.text).text().trim();
