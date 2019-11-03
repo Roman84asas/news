@@ -2,12 +2,14 @@ import React from 'react';
 import Post from './components/Post';
 import axios from 'axios';
 import  { connect } from 'react-redux';
+import { Container, Segment, Header, Item, Dimmer, Loader} from 'semantic-ui-react';
 
 
 class App extends React.Component {
     constructor(props) {
         super(props);
     }
+
 
     fetchPost() {
         const { setPosts } = this.props;
@@ -17,51 +19,53 @@ class App extends React.Component {
              })
     }
 
+    componentDidMount() {
+        this.fetchPost();
+    }
+
+    regionText(reg){
+        switch (reg) {
+            case 'UK':
+                return 'United Kingdom';
+            case 'ROM':
+                return 'Romania';
+            case 'GER':
+                return 'Germany';
+        }
+    }
   render(){
         const { posts } = this.props;
       return (
-          <div>
+          <Container>
+              <Header as='h2'>Region: { this.regionText(this.props.region.region) }</Header>
               <div>
-                  <button onClick={this.fetchPost.bind(this)}>
-                      Get posts
-                  </button>
+                  <div className="ui buttons">
+                      <button className="ui blue basic button" onClick={this.props.changeRegion.bind(this, 'UK')}>UK</button>
+                      <button className="ui blue basic button" onClick={this.props.changeRegion.bind(this, 'ROM')}>Romania</button>
+                      <button className="ui blue basic button" onClick={this.props.changeRegion.bind(this, 'GER')}>Germany</button>
+                  </div>
 
-                  <h3>Region</h3>
-                  <ul>
-                      <li>
-                          <button onClick={this.props.changeRegion.bind(this, 'ROM')}>
-                              Romania
-                          </button>
-                      </li>
-
-                      <li>
-                          <button onClick={this.props.changeRegion.bind(this, 'UK')}>
-                              UK
-                          </button>
-                      </li>
-
-                      <li>
-                          <button onClick={this.props.changeRegion.bind(this, 'GER')}>
-                              Germany
-                          </button>
-                      </li>
-                  </ul>
               </div>
-              {
-                  !posts.items.length ? (
-                      <span>Loading...</span>
-                  ) : posts.items.map((post, key) => {
-                      return(
-                          <Post
-                              key={key}
-                              title={post.title}
-                              description={post.description}
-                              image={post.image}
-                          />
-                      )
-                  })
-              }
-          </div>
+              <Item.Group divided>
+                  {
+                      !posts.items.length ? (
+                          <Segment>
+                              <Dimmer active inverted>
+                                <Loader inverted>Loading</Loader>
+                            </Dimmer>
+                          </Segment>
+                      ) : posts.items.map((post, key) => {
+                          return(
+                              <Post
+                                  key={key}
+                                  {...post}
+                              />
+                          )
+                      })
+                  }
+              </Item.Group>
+
+          </Container>
       );
   }
 }

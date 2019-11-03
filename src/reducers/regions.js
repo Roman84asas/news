@@ -1,5 +1,5 @@
 const initialState = {
-    region: 'ROM',
+    region: 'UK',
 };
 
 export default function (state = initialState, action) {
