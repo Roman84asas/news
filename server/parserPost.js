@@ -1,25 +1,32 @@
 const unirest = require('unirest');
 const cheerio = require('cheerio');
 
-async function parsePost(elems) {
-    await unirest.get(elems.url)
-        .end( ({ body }) => {
-                const $ = cheerio.load(body);
+async function parsePost(url) {
 
-                const title = $(elems.title).text().trim();
-                const text  = $(elems.text).text().trim();
-                const time  = $(elems.time).attr('datetime');
-                const image = $(elems.image).attr('src');
+    return new Promise(async (resolve, reject) => {
 
-                const post = {
-                    title: title,
-                    image: image,
-                    text:  text,
-                    time:  time
-                };
-                console.log(post)
+        await unirest.get(url).end(({ body, error }) => {
+            const $ = cheerio.load(body);
+
+            const title = $('.c-article-title').text().trim();
+            const text  = $('.c-article-content').text().trim();
+            const time  = $('.c-article-meta__time').attr('datetime');
+            const image = $('.media__img__obj').attr('src');
+
+
+            const post = {
+                title: title,
+                image: image,
+                text: text,
+                time: time
+            };
+
+            if (error) {
+                return reject(error);
             }
-        );
+            resolve(post);
+        });
+    });
 }
 
 module.exports = parsePost;
